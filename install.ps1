@@ -1,5 +1,5 @@
 ###########################################
-#
+# 
 # FLARE VM Installation Script
 #
 # To execute this script:
@@ -16,6 +16,15 @@ param (
 
 function installBoxStarter()
 {  
+
+	$proxy = new-object System.Net.WebProxy("Your_local_proxy:Your_proxy_port")
+	$Username = "Your_username"
+	$Password = ConvertTo-SecureString "Your_password" -AsPlainText -Force
+	$cred = New-Object System.Management.Automation.PSCredential $Username, $Password
+	$proxy.credentials = $cred
+	$WebClient = new-object System.Net.WebClient
+	$WebClient.proxy = $proxy
+
 	<#
 	.SYNOPSIS
 	Install BoxStarter on the current system
@@ -66,8 +75,9 @@ function installBoxStarter()
 	[System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 	[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 	
+	
 	# download and instal boxstarter
-	iex ((New-Object System.Net.WebClient).DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
+	iex ($WebClient.DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
 	
 	# Restore previous trust settings for this PowerShell session
 	# Note: SSL certs trusted from installing BoxStarter above will be trusted for the remaining PS session
@@ -109,14 +119,6 @@ Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/flare/api/v2;https:/
 
 # Go ahead and disable the Windows Updates
 Disable-MicrosoftUpdate
-try {
-  Set-MpPreference -DisableRealtimeMonitoring $true
-  iex "cinst -y disabledefender-winconfig "
-} catch {
-}
-if ([System.Environment]::OSVersion.Version.Major -eq 10) {
-  choco config set cacheLocation ${Env:TEMP}
-}
 
 # Needed for many applications
 iex "cinst -y vcredist-all"
