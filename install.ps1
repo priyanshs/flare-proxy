@@ -16,6 +16,15 @@ param (
 
 function installBoxStarter()
 {  
+
+	$proxy = new-object System.Net.WebProxy("http://192.168.1.107:3128")
+	$Username = "mtis_201717"
+	$Password = ConvertTo-SecureString "ps789" -AsPlainText -Force
+	$cred = New-Object System.Management.Automation.PSCredential $Username, $Password
+	$proxy.credentials = $cred
+	$WebClient = new-object System.Net.WebClient
+	$WebClient.proxy = $proxy
+	
 	<#
 	.SYNOPSIS
 	Install BoxStarter on the current system
@@ -66,13 +75,7 @@ function installBoxStarter()
 	[System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 	[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 	
-	$proxy = new-object System.Net.WebProxy("http://192.168.1.107:3128")
-	$Username = "mtis_201717"
-	$Password = ConvertTo-SecureString "ps789" -AsPlainText -Force
-	$cred = New-Object System.Management.Automation.PSCredential $Username, $Password
-	$proxy.credentials = $cred
-	$WebClient = new-object System.Net.WebClient
-	$WebClient.proxy = $proxy
+	
 	# download and instal boxstarter
 	iex ($WebClient.DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
 	
