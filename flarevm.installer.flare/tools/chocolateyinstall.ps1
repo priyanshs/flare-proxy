@@ -1,9 +1,13 @@
+$ErrorActionPreference = 'Stop'
+
 Import-Module Boxstarter.Chocolatey
 Import-Module "$($Boxstarter.BaseDir)\Boxstarter.Common\boxstarter.common.psd1"
 
 $packageName      = 'flarevm.installer.flare'
 $toolsDir         = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$flareFeed        = "https://www.myget.org/F/flare/api/v2"
+# TODO: Change back
+# $flareFeed      = "https://www.myget.org/F/flare/api/v2"
+$flareFeed        = "https://www.myget.org/F/flare-dev/api/v2"
 $cache            =  "${Env:UserProfile}\AppData\Local\ChocoCache"
 $globalCinstArgs  = "--cacheLocation $cache -y"
 $startPath        = Join-Path ${Env:ProgramData} "Microsoft\Windows\Start Menu\Programs\FLARE"
@@ -120,6 +124,7 @@ function Main {
     InitialSetup
 
     $json = LoadPackages $pkgPath
+    Write-Host $json
     if ($json -eq $null -Or $json.packages -eq $null) {
         Write-Host "Packages property not found! Exiting"
         return -1

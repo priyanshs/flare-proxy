@@ -1,3 +1,8 @@
+I had a few troubles installing flare on my virtual machine, so this contains a few extra lines of code so it works on our university proxy servers
+
+
+
+
       ______ _               _____  ______   __      ____  __
      |  ____| |        /\   |  __ \|  ____|  \ \    / /  \/  |
      | |__  | |       /  \  | |__) | |__ _____\ \  / /| \  / |

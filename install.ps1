@@ -1,5 +1,4 @@
 ###########################################
-#
 # FLARE VM Installation Script
 #
 # To execute this script:
@@ -15,18 +14,18 @@ param (
 
 
 function installBoxStarter()
-{  
+{
 	<#
 	.SYNOPSIS
 	Install BoxStarter on the current system
-	
+
 	.DESCRIPTION
 	Install BoxStarter on the current system. Returns $true or $false to indicate success or failure. On
-	fresh windows 7 systems, some root certificates are not installed and updated properly. Therefore, 
+	fresh windows 7 systems, some root certificates are not installed and updated properly. Therefore,
 	this funciton also temporarily trust all certificates before installing BoxStarter.
-	
+
 	#>
-	
+
 	# https://stackoverflow.com/questions/11696944/powershell-v3-invoke-webrequest-https-error
 	# Allows current PowerShell session to trust all certificates
 	# Also a good find: https://www.briantist.com/errors/could-not-establish-trust-relationship-for-the-ssltls-secure-channel/
@@ -51,7 +50,7 @@ function installBoxStarter()
 	} catch {
 		Write-Debug "Failed to find SSL type...1"
 	}
-	
+
 	try {
 		$AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls'
 	} catch {
@@ -65,10 +64,17 @@ function installBoxStarter()
 	# Become overly trusting
 	[System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 	[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-	
+
+	$proxy = new-object System.Net.WebProxy("http://Your_ProxyServer:Your_proxyport")
+	$Username = "Your_username"
+	$Password = ConvertTo-SecureString "Your_password" -AsPlainText -Force
+	$cred = New-Object System.Management.Automation.PSCredential $Username, $Password
+	$proxy.credentials = $cred
+	$WebClient = new-object System.Net.WebClient
+	$WebClient.proxy = $proxy
 	# download and instal boxstarter
-	iex ((New-Object System.Net.WebClient).DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
-	
+	iex ($WebClient.DownloadString('http://boxstarter.org/bootstrapper.ps1')); get-boxstarter -Force
+
 	# Restore previous trust settings for this PowerShell session
 	# Note: SSL certs trusted from installing BoxStarter above will be trusted for the remaining PS session
 	[System.Net.ServicePointManager]::SecurityProtocol = $prevSecProtocol
@@ -109,14 +115,6 @@ Set-BoxstarterConfig -NugetSources "https://www.myget.org/F/flare/api/v2;https:/
 
 # Go ahead and disable the Windows Updates
 Disable-MicrosoftUpdate
-try {
-  Set-MpPreference -DisableRealtimeMonitoring $true
-  iex "cinst -y disabledefender-winconfig "
-} catch {
-}
-if ([System.Environment]::OSVersion.Version.Major -eq 10) {
-  choco config set cacheLocation ${Env:TEMP}
-}
 
 # Needed for many applications
 iex "cinst -y vcredist-all"
