@@ -1,9 +1,10 @@
-I had a few troubles installing flare on my virtual machine, so this contains a few extra lines of code so it works on our university proxy servers
+I had a few troubles installing flare on my virtual machine, so this contains a few extra lines of code so it works on our university proxy servers. [Link to the blog post](https://priyansh.me/post/180266009724/i-had-some-problems-installing-flare-vm).
+
+In the install.ps1 file, replace the proxy address, port and your credentials.
 
 
 
-
-      ______ _               _____  ______   __      ____  __
+______ _               _____  ______   __      ____  __
      |  ____| |        /\   |  __ \|  ____|  \ \    / /  \/  |
      | |__  | |       /  \  | |__) | |__ _____\ \  / /| \  / |
      |  __| | |      / /\ \ |  _  /|  __|______\ \/ / | |\/| |
